@@ -1,0 +1,33 @@
+{
+  "name": "univsearch-backend",
+  "version": "1.0.0",
+  "description": "backend for univsearch - a search engine for universities",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "start": "node app.js"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/limatgans/univSearch.git"
+  },
+  "keywords": [
+    "universities",
+    "search",
+    "engine",
+    "backend",
+    "node"
+  ],
+  "author": "limatgans",
+  "license": "MIT",
+  "bugs": {
+    "url": "https://github.com/limatgans/univSearch/issues"
+  },
+  "homepage": "https://github.com/limatgans/univSearch#readme",
+  "dependencies": {
+    "body-parser": "^1.19.0",
+    "elasticsearch": "^16.7.2",
+    "express": "^4.17.1",
+    "prettier": "^2.2.1"
+  }
+}
