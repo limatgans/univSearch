@@ -28,6 +28,8 @@
     "body-parser": "^1.19.0",
     "elasticsearch": "^16.7.2",
     "express": "^4.17.1",
+    "mongoosastic": "^4.6.0",
+    "mongoose": "^5.12.2",
     "prettier": "^2.2.1"
   }
 }
