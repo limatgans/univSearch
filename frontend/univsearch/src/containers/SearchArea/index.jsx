@@ -7,7 +7,9 @@ export default function SearchArea(props) {
   const {
     handleSearch,
     countryCodes = ["US", "IND"],
-    domains = [".edu", ".us"]
+    domains = [".edu", ".us"],
+    handleCountryCodeChange=()=>{},
+    handleDomainChange=()=>{}
   } = props;
 
   const useStyles = makeStyles((theme) => ({
@@ -23,9 +25,22 @@ export default function SearchArea(props) {
   return ( 
     <div>
       <form className={classes.root} noValidate>
-        <SearchBar label="Search Universities" handleSearch={handleSearch}/>
-        <Filter label="Country Code" helperText="Select a Country Code" menuItems={countryCodes}/>
-        <Filter label="Domain" helperText="Select a Domain" menuItems={domains}/>
+        <SearchBar 
+          label="Search Universities"
+          handleSearch={handleSearch}
+        />
+        <Filter 
+          label="Country Code" 
+          helperText="Select a Country Code" 
+          menuItems={countryCodes}
+          handleFilterChange={handleCountryCodeChange}
+        />
+        <Filter 
+          label="Domain" 
+          helperText="Select a Domain" 
+          menuItems={domains}
+          handleFilterChange={handleDomainChange}
+        />
       </form>
     </div>
   );

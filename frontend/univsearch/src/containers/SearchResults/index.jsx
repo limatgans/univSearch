@@ -49,7 +49,7 @@ export default function SearchResults(props) {
     }],
     pageNumber, 
     totalCount, 
-    disable, 
+    disablePagination, 
     visible=true, 
     handlePageChange
   }= props;
@@ -78,7 +78,7 @@ export default function SearchResults(props) {
           <SearchPagination 
             pageNumber={pageNumber} 
             totalCount={totalCount} 
-            disable={disable}
+            disable={disablePagination}
             handlePageChange={handlePageChange}
             visible={visible}
           />

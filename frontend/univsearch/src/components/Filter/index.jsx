@@ -28,7 +28,7 @@ export default function Filter(props) {
       id={id}
       select
       label={label}
-      value={defaultValue}
+      value="Please Select"
       onChange={handleFilterChange}
       helperText={helperText}
       variant="outlined"

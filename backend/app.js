@@ -25,15 +25,15 @@ let UnivSchema = new mongoose.Schema({
 	domain: String,
 	name: String,
 	web_page: String,
-	description:String,
-	image: String,
-	title: String,
+	// description:String,
+	// image: String,
+	// title: String,
 });
 
-UnivSchema.plugin(mongoosastic, {
-	"host": env.ES_HOST ||"localhost",
-	"port": env.ES_PORT || 9200
-});
+// UnivSchema.plugin(mongoosastic, {
+// 	"host": env.ES_HOST ||"localhost",
+// 	"port": env.ES_PORT || 9200
+// });
 
 
 /* 
