@@ -8,6 +8,8 @@ export default function SearchArea(props) {
     handleSearch,
     countryCodes = ["US", "IND"],
     domains = [".edu", ".us"],
+    domain,
+    countrycode,
     handleCountryCodeChange=()=>{},
     handleDomainChange=()=>{}
   } = props;
@@ -30,15 +32,19 @@ export default function SearchArea(props) {
           handleSearch={handleSearch}
         />
         <Filter 
+          id = "countryCode"
           label="Country Code" 
           helperText="Select a Country Code" 
           menuItems={countryCodes}
+          value={countrycode}
           handleFilterChange={handleCountryCodeChange}
         />
-        <Filter 
+        <Filter
+          id = "domain"
           label="Domain" 
           helperText="Select a Domain" 
           menuItems={domains}
+          value={domain}
           handleFilterChange={handleDomainChange}
         />
       </form>

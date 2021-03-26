@@ -4,55 +4,17 @@ import SearchPagination from "../../components/SearchPagination";
 import { useState } from 'react';
 
 export default function SearchResults(props) {
+  console.log({props});
   const {
-    data = [{
-      "alpha_two_code": "US",
-      "country": "United States",
-      "domain": "acu.edu",
-      "name": "Abilene Christian University",
-      "web_page": "http://www.acu.edu/"
-    },
-    {
-      "alpha_two_code": "US",
-      "country": "United States",
-      "domain": "acu.edu",
-      "name": "Abilene Christian University",
-      "web_page": "http://www.acu.edu/"
-    },
-    {
-      "alpha_two_code": "US",
-      "country": "United States",
-      "domain": "acu.edu",
-      "name": "Abilene Christian University",
-      "web_page": "http://www.acu.edu/"
-    },
-    {
-      "alpha_two_code": "US",
-      "country": "United States",
-      "domain": "acu.edu",
-      "name": "Abilene Christian University",
-      "web_page": "http://www.acu.edu/"
-    },
-    {
-      "alpha_two_code": "US",
-      "country": "United States",
-      "domain": "acu.edu",
-      "name": "Abilene Christian University",
-      "web_page": "http://www.acu.edu/"
-    },
-    {
-      "alpha_two_code": "US",
-      "country": "United States",
-      "domain": "acu.edu",
-      "name": "Abilene Christian University",
-      "web_page": "http://www.acu.edu/"
-    }],
+    data = [],
     pageNumber, 
     totalCount, 
     disablePagination, 
     visible=true, 
     handlePageChange
   }= props;
+
+  const defaultImage = "https://images.unsplash.com/photo-1541339907198-e08756dedf3f";
 
   const styles = {
     "display": "flex",
@@ -69,8 +31,9 @@ export default function SearchResults(props) {
             return (
               <UnivCard
                 title={d.name}
+                key={d._id}
                 description={d.description}
-                image={d.image}
+                image={d.image !== ""? d.image: defaultImage}
                 webPage={d.web_page}
               />
             );

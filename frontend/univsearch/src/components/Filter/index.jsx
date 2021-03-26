@@ -10,7 +10,8 @@ export default function Filter(props) {
     menuItems = [],
     handleFilterChange = () => {},
     helperText="Please Select",
-    id="filter"
+    id="filter",
+    value
   } = props;
 
   const useStyles = makeStyles((theme) => ({
@@ -28,13 +29,13 @@ export default function Filter(props) {
       id={id}
       select
       label={label}
-      value="Please Select"
+      value={value}
       onChange={handleFilterChange}
       helperText={helperText}
       variant="outlined"
       disabled={menuItems.length === 0}
     >
-      {menuItems.map((menu) => <MenuItem value={menu}>{menu}</MenuItem> )}
+      {menuItems.map((menu) => <MenuItem key={menu} value={menu}>{menu}</MenuItem> )}
     </TextField>
   );
 }

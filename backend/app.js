@@ -7,14 +7,16 @@ const mongoosastic = require('mongoosastic');
 const {getMetadata} = require('page-metadata-parser');
 const domino = require('domino');
 const fetch = require('node-fetch');
+const cors = require('cors');
 
 const env = process.env;
 
 // Initializing App
 const app = express();
 app.use(bodyParser.json());
+app.use(cors());
 
-app.listen(env.PORT || 3000, () => {
+app.listen(env.PORT || 8080, () => {
 	console.log("server connected");
 });
 

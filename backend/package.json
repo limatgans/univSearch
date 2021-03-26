@@ -26,6 +26,7 @@
   "homepage": "https://github.com/limatgans/univSearch#readme",
   "dependencies": {
     "body-parser": "^1.19.0",
+    "cors": "^2.8.5",
     "domino": "^2.1.6",
     "elasticsearch": "^16.7.2",
     "express": "^4.17.1",
