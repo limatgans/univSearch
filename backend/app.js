@@ -210,3 +210,23 @@ app.delete("/university/:id", async (req, res) => {
 		res.status(500).send({err});
 	}
 });
+
+app.get("/countrycodes", async (req, res) => {
+	try {
+		const countryCodes = await Univ.distinct("alpha_two_code").exec();
+		res.json({data: countryCodes});
+	} catch(err) {
+		console.log(err);
+		res.status(500).send({err});
+	}
+});
+
+app.get("/domains", async (req, res) => {
+	try {
+		const domains = await Univ.distinct("domain").exec();
+		res.json({data: domains});
+	} catch(err) {
+		console.log(err);
+		res.status(500).send({err})
+	}
+});
