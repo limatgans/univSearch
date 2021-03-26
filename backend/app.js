@@ -4,6 +4,9 @@ const bodyParser = require("body-parser");
 const elasticsearch = require("elasticsearch");
 const mongoose = require('mongoose');
 const mongoosastic = require('mongoosastic');
+const {getMetadata} = require('page-metadata-parser');
+const domino = require('domino');
+const fetch = require('node-fetch');
 
 const env = process.env;
 
@@ -15,68 +18,195 @@ app.listen(env.PORT || 3000, () => {
 	console.log("server connected");
 });
 
+mongoose.connect(env.MONGO_CONNECTION_STRING || 'mongodb://localhost:27017/univsearch', {
+	useNewUrlParser: true,
+	useUnifiedTopology: true
+}, (err)=> {
+	if (err) {
+		console.log("Mongoose couldn't connect to MongoDB");
+		console.log(err);
+	} else {
+		console.log("Connected to MongoDb");
+	}
+});
 
-mongoose.connect(env.MONGO_CONNECTION_STRING || 'mongodb://localhost:27017/mongosync');
-
-// Modals
+// Schema
 let UnivSchema = new mongoose.Schema({
 	alpha_two_code: String,
 	country: String,
 	domain: String,
 	name: String,
 	web_page: String,
-	// description:String,
-	// image: String,
-	// title: String,
+	description:String,
+	image: String,
+	title: String,
 });
 
-// UnivSchema.plugin(mongoosastic, {
-// 	"host": env.ES_HOST ||"localhost",
-// 	"port": env.ES_PORT || 9200
-// });
-
+// Modal
+const Univ = mongoose.model("University", UnivSchema)
 
 /* 
-// Configuring esClient
-const esClient = elasticsearch.Client({
-	host: env.ES_URL || "http://127.0.0.1:9200",
-});
+	// Connecting with Elastic Search using mongoosastic
+	UnivSchema.plugin(mongoosastic, {
+		"host": env.ES_HOST ||"localhost",
+		"port": env.ES_PORT || 9200
+	});
 
-
-app.post("/universities", (req, res) => {
-	esClient.index({
-		index: 'universities',
-		body: {
-			"alpha_two_code": req.body.alphaTwoCode,
-			"country": req.body.country,
-			"domain": req.body.domain,
-			"name": req.name,
-			"web_page": req.webPage
+	// Mapping indexes on ES
+	Univ.createMapping(function(err, mapping){  
+		if(err){
+			console.log('error creating mapping');
+			console.log(err);
+		}else{
+			console.log('mapping created!');
+			console.log(mapping);
 		}
-	})
-	.then(response => {
-		return res.json({response, "message": "Indexing successful"})
-	})
-	.catch(err => {
-		return res.status(500).json({err, "message": "Error"})
-	})
-});
-
-app.get("/universities", (req, res) => {
-	const searchText = req.query.text
-	esClient.search({
-		index: "universities",
-		body: {
-			query: {
-				match: {"name": searchText.trim()}
-			}
-		}
-	})
-	.then(response => {
-		return res.json(response)
-	})
-	.catch(err => {
-		return res.status(500).json({err, "message": "Error"})
-	})
-});
+	});
 */
+
+// Utils
+const getMetaDataFromURL = async(url) => {
+	try {
+		const response = await fetch(url);
+		const html = await response.text();
+		const doc = domino.createWindow(html).document;
+		const metadata = getMetadata(doc, url);
+		return metadata;
+	} catch (err) {
+		console.log(err);
+		return {};
+	}
+};
+
+// CRUD Operations begins here
+app.post("/university", async (req, res) => {
+
+	try {
+		// Parsing Metatags from web page
+		const url = req.body.web_page;
+		const metadata = await getMetaDataFromURL(url);
+
+		const {
+			description = "",
+			image="",
+			title=""
+		} = metadata;
+
+		const univ = new Univ({  
+			alpha_two_code: req.body.alpha_two_code,
+			country: req.body.country,
+			domain: req.body.domain,
+			name: req.body.name,
+			web_page: req.body.web_page,
+			description,
+			image,
+			title
+		});
+		const postResponse = await univ.save();
+		console.log(postResponse);
+		res.json({postResponse});
+	} catch(err) {
+		console.log(err);
+		res.status(500).json({err});
+	}
+
+});
+
+app.get("/universities", async (req, res) => {
+	const {
+		alpha_two_code="",
+		domain="",
+		searchTerm = "",
+	} = req.query;
+
+	const page = parseInt(req.query.page, 10) || 0;
+	const limit = parseInt(req.query.limit, 10) || 10;
+	
+
+	const query = {};
+
+	if (searchTerm !== "") {
+		query.name = searchTerm;
+	}
+
+	if (alpha_two_code !== "") {
+		query.alpha_two_code = alpha_two_code;
+	}
+
+	if (domain !== "") {
+		query.domain = domain;
+	}
+
+	try {
+		const universities = await Univ.find(query, null, { skip: page, limit }).exec();
+		const totalCount = await Univ.countDocuments(query).exec();
+		res.json({data: universities, totalCount, limit, page});
+	} catch(err) {
+		res.status(500).json({err});
+	}
+
+});
+
+app.get("/university/:id", async (req, res) => {
+	const {id} = req.params;
+	try { 
+		const univ = await Univ.findById(id).exec();
+		res.json({data: univ});
+	}
+	catch (err) {
+		res.status(500).send({err});
+	}
+});
+
+app.patch("/university/:id", async (req, res) => {
+	console.log(req.params)
+	const {id} = req.params;
+	const {
+		alpha_two_code,
+		country,
+		domain,
+		name,
+		web_page,
+	} = req.body;
+
+	let metadata = {}
+	if (web_page) {
+		metadata = await getMetaDataFromURL(web_page);
+	}
+
+	const {
+		description = "",
+		image = "",
+		title= ""
+	} = metadata;
+
+	const doc = {
+		alpha_two_code,
+		country,
+		domain,
+		name,
+		web_page,
+		description,
+		image,
+		title
+	};
+
+	try {
+		const univ = await Univ.updateOne({"_id": id}, doc, {omitUndefined: true}).exec();
+		res.status(204).json({});
+	}
+	catch (err) {
+		res.status(500).send({err});
+	}
+});
+
+app.delete("/university/:id", async (req, res) => {
+	const {id} = req.params;
+	try {
+		const univ = await Univ.deleteOne({"_id": id}).exec();
+		res.status(204).send({});
+	}
+	catch (err) {
+		res.status(500).send({err});
+	}
+});
